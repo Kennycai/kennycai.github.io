@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://kennycai.github.io').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.6.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="基本概念简介MongoDB的特点：扩展策略、直观的数据模型。在mongodb中，编程语言定义的对象能被“原封不变”地持久化，消除对象结构和程序映射的复杂性。 主要特性数据模型">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MongoDB实战-读书笔记">
+<meta property="og:url" content="https://kennycai.github.io/2021/09/13/database/mongo/index.html">
+<meta property="og:site_name" content="Blog">
+<meta property="og:description" content="基本概念简介MongoDB的特点：扩展策略、直观的数据模型。在mongodb中，编程语言定义的对象能被“原封不变”地持久化，消除对象结构和程序映射的复杂性。 主要特性数据模型">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://kennycai.github.io/images/database/mongo/%E5%A4%8D%E5%90%88%E7%B4%A2%E5%BC%95.jpg">
+<meta property="og:image" content="https://kennycai.github.io/images/database/mongo/%E5%89%AF%E6%9C%AC%E9%9B%86.jpg">
+<meta property="og:image" content="https://kennycai.github.io/images/database/mongo/%E5%88%86%E7%89%87.jpg">
+<meta property="article:published_time" content="2021-09-13T11:11:11.000Z">
+<meta property="article:modified_time" content="2025-10-07T15:15:47.908Z">
+<meta property="article:author" content="Cai Kenny">
+<meta property="article:tag" content="mongo">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://kennycai.github.io/images/database/mongo/%E5%A4%8D%E5%90%88%E7%B4%A2%E5%BC%95.jpg">
+
+<link rel="canonical" href="https://kennycai.github.io/2021/09/13/database/mongo/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>MongoDB实战-读书笔记 | Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://kennycai.github.io/2021/09/13/database/mongo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Cai Kenny">
+      <meta itemprop="description" content="A Programmer">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MongoDB实战-读书笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-09-13 11:11:11" itemprop="dateCreated datePublished" datetime="2021-09-13T11:11:11+00:00">2021-09-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2025-10-07 15:15:47" itemprop="dateModified" datetime="2025-10-07T15:15:47+00:00">2025-10-07</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/database/" itemprop="url" rel="index">
+                    <span itemprop="name">database</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>MongoDB的特点：扩展策略、直观的数据模型。在mongodb中，编程语言定义的对象能被“原封不变”地持久化，消除对象结构和程序映射的复杂性。</p>
+<h3 id="主要特性"><a href="#主要特性" class="headerlink" title="主要特性"></a>主要特性</h3><h4 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h4><p>关系型与正规化：对于关系型数据库，数据表本质上是<strong>扁平的</strong>，因此表示多个一对多关系就需要多张表。经常用到的技术是<strong>拆表</strong>，这种技术是<strong>正规化</strong>。</p>
+<p>但对于Mongo来说，文档支持嵌套等多种格式，无需事先定义<strong>Schema</strong>。</p>
+<h4 id="即时查询"><a href="#即时查询" class="headerlink" title="即时查询"></a>即时查询</h4><p>mysql和mongodb都支持<strong>即时查询</strong>，不同的是：前者依赖正则化的模型；后者假定查询字段是存储与文档中的。</p>
+<h4 id="二级索引"><a href="#二级索引" class="headerlink" title="二级索引"></a>二级索引</h4><p>mongodb支持二级索引，是通过b-tree实现的。</p>
+<h4 id="复制"><a href="#复制" class="headerlink" title="复制"></a>复制</h4><p>通过<strong>副本集</strong>的拓扑结构来提供复制功能，其目的是：<strong>提供数据的冗余</strong>。</p>
+<p>副本集的主节点能接受读写操作，但从节点是只读的。主节点出问题，会自动故障转移，选取一个从节点升级为主节点。</p>
+<h4 id="写速度和持久性"><a href="#写速度和持久性" class="headerlink" title="写速度和持久性"></a>写速度和持久性</h4><p>写速度：给定时间内，数据库可以处理的插入、更新和删除操作的数量。</p>
+<p>持久性：数据库保持上述写操作的结果不改变的，所用的时间长短。</p>
+<p>DB领域，<strong>写速度和持久性存在一种相反关系</strong>。很好理解，例如memcached，直接写入内存，写速度非常快，但同时数据完全易失。</p>
+<p>在MongoDB中，用户可以选择写入语义，决定是否开启Journaling日志记录，通过这种方式来控制速度和持久性间的平衡。默认所有的写操作都是<strong>fire-and-forget</strong><br> 的，即写操作通过TCP套接字发送，不要求数据库应答。如果用户需要获得应答，可以使用特殊的<strong>安全模式</strong>发起写操作，所有驱动都提供这个安全模式。该模式强制数据库作出应答，确保数据库正确无误地接收到了写操作。安全模式是可配置的，还可用于阻塞操作，直到写操作被复制到特定数量的服务器。对于高容量、低价值的数据（例如点击流和日志），fire-and-forget风格的写操作是很理想的选择。对于重要的数据，则更倾向于安全模式。</p>
+<p>mongo中，<strong>Journaling日志</strong>默认开启。所有写操作会被提交到一个只能追加的日志中。以应对故障后的，重启修复服务。</p>
+<h4 id="数据库扩展"><a href="#数据库扩展" class="headerlink" title="数据库扩展"></a>数据库扩展</h4><ul>
+<li>垂直扩展（向上扩展）：升级硬件，来提高单点性能</li>
+<li>水平扩展（向外扩展）：将数据库分布到多台机器，是基于<strong>自动分片</strong>。其中，单独的分片由一个副本集组成，至少有2个节点，保证没有单点失败。</li>
+</ul>
+<h3 id="核心服务器和工具"><a href="#核心服务器和工具" class="headerlink" title="核心服务器和工具"></a>核心服务器和工具</h3><h4 id="核心服务器"><a href="#核心服务器" class="headerlink" title="核心服务器"></a>核心服务器</h4><p>通过<code>mongod</code>可以运行核心服务器。数据文件存储在<code>/data/db</code>中。如果下载编译mongo的源代码，需要手动创建<code>/data/db</code>，并且为其分配权限。</p>
+<p>其中，mongo的<strong>内存管理</strong>是由操作系统来处理的。数据文件通过<code>mmap()</code>系统API，映射成系统的虚拟内存。</p>
+<h4 id="lock文件和-ns文件"><a href="#lock文件和-ns文件" class="headerlink" title=".lock文件和.ns文件"></a>.lock文件和.ns文件</h4><p>先来看mongod.lock文件，其中存储了服务器的进程ID。数据库文件本身是依据所属的数据库命名的。garden.ns是第一个生成的文件。文件扩展名ns，表示namespaces，，意即命名空间。数据库中的每个集合和索引都有自己的命名空间，每个命名空间的元数据都存放在这个文件里。默认情况下，.ns文件大小固定在16 MB，大约可以存储24 000个命名空间。也就是说数据库中的索引和集合总数不能超过24 000。我们几乎不可能使用这么多集合与索引，但如果真有需要，可以使用–nssize服务器选项让该文件变得更大一点。</p>
+<h4 id="命令行"><a href="#命令行" class="headerlink" title="命令行"></a>命令行</h4><p>是基于JavaScript编写的。所以能看到很多通用的语法，以及输出的格式。</p>
+<h4 id="命令行工具"><a href="#命令行工具" class="headerlink" title="命令行工具"></a>命令行工具</h4><ul>
+<li><code>mongodump</code>和<code>mongorestore</code>：前者用<code>BSON</code>格式，来备份数据库数据。方便后者恢复。</li>
+<li><code>mongoexport</code>和<code>mongoimport</code>：导入导出JSON、CSV和TSV格式数据。</li>
+</ul>
+<h3 id="Mongo的场景"><a href="#Mongo的场景" class="headerlink" title="Mongo的场景"></a>Mongo的场景</h3><p>适用于<strong>事先无法知晓数据结构</strong>的数据，或者<strong>数据结构经常不确定性较大</strong>的数据。</p>
+<p>除此之外，还适用于<strong>与分析相关的场景</strong>。mongo提供一种<strong>固定集合</strong>，常用于日志，特点是<strong>分配的大小固定</strong>，类似于循环队列。</p>
+<h2 id="程序编写基础"><a href="#程序编写基础" class="headerlink" title="程序编写基础"></a>程序编写基础</h2><p>mongo驱动的find方法，返回的是<strong>游标对象</strong>，可以理解为迭代器的下标。</p>
+<h3 id="驱动工作原理"><a href="#驱动工作原理" class="headerlink" title="驱动工作原理"></a>驱动工作原理</h3><p>主要有3个功能：</p>
+<ol>
+<li>生成MongoDB对象的ID，它是存储在<code>_id</code>字段中的默认值</li>
+<li>驱动会把特定语言的文档表述，和<code>BSON</code>互换</li>
+<li>使用TCP套接字与数据库通信</li>
+</ol>
+<h4 id="对象ID"><a href="#对象ID" class="headerlink" title="对象ID"></a>对象ID</h4><p>在自带的交互式命令行中:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; id = ObjectId()</span><br><span class="line">ObjectId(<span class="string">"5d9413867cc8dacf9247fe3e"</span>)</span><br></pre></td></tr></table></figure>
+
+<p>对于生成的<code>5d9413867cc8dacf9247fe3e</code>:</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">- </span>5d941386 ，这4个字节是Unix时间戳，单位秒数</span><br><span class="line"><span class="bullet">- </span>7cc8da，3字节的机器ID</span><br><span class="line"><span class="bullet">- </span>cf92，2字节的进程ID</span><br><span class="line"><span class="bullet">- </span>47fe3e，3字节进程的局部计数器</span><br></pre></td></tr></table></figure>
+
+<h3 id="安全写入模式-Write-Concern"><a href="#安全写入模式-Write-Concern" class="headerlink" title="安全写入模式(Write Concern)"></a>安全写入模式(Write Concern)</h3><p>对所有的写操作（插入、更新或删除）都能开启此模式。以此保证，操作一定在数据库层面生效。</p>
+<p>在v4.0中，以insert为例，文档如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">db.collection.insert(</span><br><span class="line">   &lt;<span class="built_in">document</span> or array <span class="keyword">of</span> documents&gt;,</span><br><span class="line">   &#123;</span><br><span class="line">     writeConcern: <span class="xml"><span class="tag">&lt;<span class="name">document</span>&gt;</span>,</span></span><br><span class="line">     ordered: &lt;boolean&gt;</span><br><span class="line">   &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>关于 Write Concern的详细参数，可以看这篇文档：<a href="https://docs.mongodb.com/manual/reference/write-concern/" target="_blank" rel="noopener">Write Concern — MongoDB Manual</a></p>
+<p>其中，重要的是<code>w</code> 参数，它可以指定是否使用应答写入。目前默认是1，应答式写入。设置为0，则是非应答式。</p>
+<h2 id="面向文档的数据"><a href="#面向文档的数据" class="headerlink" title="面向文档的数据"></a>面向文档的数据</h2><h3 id="具体细节"><a href="#具体细节" class="headerlink" title="具体细节"></a>具体细节</h3><h4 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h4><p>即使使用<code>use</code>切换一个新的数据库，如果没有insert数据，该数据库并不会创建。</p>
+<p>mongodb会为数据、集合、索引进行空间分配，并且采取的是<strong>预分配</strong>的方式，每次空间不够的时候，扩充2倍。</p>
+<p>通过 <code>db.stats()</code> 可以查看当前db的状态，下面是一个示例：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&gt; db.stats()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"db"</span> : <span class="string">"info"</span>,</span><br><span class="line">    <span class="string">"collections"</span> : <span class="number">3</span>,</span><br><span class="line">    <span class="string">"views"</span> : <span class="number">0</span>,</span><br><span class="line">    <span class="string">"objects"</span> : <span class="number">11</span>,</span><br><span class="line">    <span class="string">"avgObjSize"</span> : <span class="number">255.8181818181818</span>,</span><br><span class="line">    <span class="string">"dataSize"</span> : <span class="number">2814</span>, <span class="comment">// 数据库中BSON对象实际大小</span></span><br><span class="line">    <span class="string">"storageSize"</span> : <span class="number">86016</span>, <span class="comment">// 包含了集合增长的预留空间和未分配的已删除空间</span></span><br><span class="line">    <span class="string">"numExtents"</span> : <span class="number">0</span>,</span><br><span class="line">    <span class="string">"indexes"</span> : <span class="number">5</span>,</span><br><span class="line">    <span class="string">"indexSize"</span> : <span class="number">155648</span>, <span class="comment">// 数据库索引大小的空间</span></span><br><span class="line">    <span class="string">"fsUsedSize"</span> : <span class="number">86272356352</span>,</span><br><span class="line">    <span class="string">"fsTotalSize"</span> : <span class="number">250685575168</span>, </span><br><span class="line">    <span class="string">"ok"</span> : <span class="number">1</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子里，fileSize字段标明了为该数据库分配的文件空间的总和，就是简单地把数据库的多个数据文件（<em>\</em>.0和**.1…）的大小加起来。比较有意思的是dataSize和storageSize 两者的差值，前者是数据库中BSON对象的实际大小，后者包含了为集合增长预留的额外空间和未分配的已删除空间。最后，indexSize的值是数据库索引大小的总合。关注总计索引大小是很重要的，当所有用到的索引都能放入内存时，数据库的性能是最好的。</p>
+<h4 id="集合"><a href="#集合" class="headerlink" title="集合"></a>集合</h4><p>1、重命名操作：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; use test</span><br><span class="line">&gt; db.orders.renameCollection( <span class="string">"orders2014"</span> )</span><br></pre></td></tr></table></figure>
+
+<p>2、固定集合</p>
+<p>对应日志统计之类的、<strong>只有最近的数据才有价值</strong>的场景下，可以使用<strong>固定集合</strong>：一旦容量到上限，后续插入会逐步覆盖最先插入的文档。</p>
+<p>创建时候，需要同时指定<code>createCollection</code>的capped和size参数：</p>
+<figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">db.create<span class="constructor">Collection('<span class="params">logs</span>',&#123; <span class="params">capped</span> : <span class="params">true</span>, <span class="params">size</span> : 5242880 &#125;)</span></span><br></pre></td></tr></table></figure>
+
+<p>为了性能优化，mongo<strong>不会为固定集合创建针对<code>_id</code>的索引</strong>，为此，MongoDB提供了一个特殊的排序操作符，按自然插入顺序返回集合的文档。同时，不能从中删除doc，也不能执行任何更改文档大小的更新操作。</p>
+<p>3、键名选择</p>
+<p><strong>慎重选择键名</strong>，例如，用<code>dob</code>代替<code>date_of_birth</code>，一个文档可以省下10字节。</p>
+<h2 id="查询和聚合"><a href="#查询和聚合" class="headerlink" title="查询和聚合"></a>查询和聚合</h2><h3 id="查询常见技巧"><a href="#查询常见技巧" class="headerlink" title="查询常见技巧"></a>查询常见技巧</h3><p><strong>分页查询</strong>可以通过<code>skip</code>和<code>limit</code>配合使用实现。</p>
+<blockquote>
+<p>skip 与 limit 的语义很容易理解，这两个查询选项的作用总能满足预期。 但在向 skip 传递很大的值（比如大于10 000的值）时需要注意，因为执行这种查询要扫描和 skip 值等量的文档。例如，假设正根据日期降序对100万个文档进行分页，每页10条结果。这意味着显示第50 000页的查询要跳过500 000个文档，这样做的效率太低了。更好的策略是省略skip ，添加一个范围条件，指明下一结果集从何处开始。如此一来，这条查询：</p>
+<p>db.docs.find({}).skip(500000).limit(10).sort({date: -1})</p>
+<p> 就变成了：</p>
+<p>db.docs.find({date: {$gt: previous_page_date}}).limit(10).sort({date: -1})</p>
+<p>第二条查询扫描的文档远少于第一条。唯一的问题是如果每个文档的日期不唯一，相同的文档可能会显示多次。</p>
+</blockquote>
+<p><strong>空值查询</strong>可以通过驱动的空值字面量实现，比如在node中，想查询<code>logs</code>中不包含<code>name</code>字段的记录：<code>db.logs.find({ name: null })</code>。</p>
+<p><strong>减少序列化和网络传输</strong>，可以通过给定find的第二个参数，来选定数据库返回给驱动的文档的字段，比如：<code>db.products.find({}, {_id: 1})</code>。这条命令，只返回文档的<code>_id</code>字段。</p>
+<p><strong>复合索引</strong>，复合索引的设定，遵循着「从准确到宽泛」的规则。比如对于订单记录，有着下单人和时间2个字段。应该先为下单人字段设置索引，再为时间字段设置索引。可以理解为前者是精确查找，可以大大缩小查找结果集；后者是范围查找。</p>
+<p><strong>嵌套字段查询</strong>，对于负责对象字段的查询，直接通过<code>.</code>运算符即可。例如：<code>db.demos.find({a: {b : 1}})</code>和<code>db.demos.find({&quot;a.b&quot;: 1})</code> 是等效的。</p>
+<h3 id="常见查询语言"><a href="#常见查询语言" class="headerlink" title="常见查询语言"></a>常见查询语言</h3><p>MongoDB的查询本质：实例化了一个游标，并获取它的结果集。</p>
+<h4 id="范围查询"><a href="#范围查询" class="headerlink" title="范围查询"></a>范围查询</h4><p>范围操作符用法很简单，但注意：不要在范围查找时候误用<strong>重复搜索键</strong>。</p>
+<p>错误：<code>db.users.find({age: { $gte: 0 }, age: { $lte: 30 } })</code></p>
+<p>正确：<code>db.users.find({age: {$gte: 0, $lte: 30}})</code></p>
+<h4 id="集合操作"><a href="#集合操作" class="headerlink" title="集合操作"></a>集合操作</h4><p>集合操作符一共有3个：<code>$in</code>、<code>$all</code>、<code>$nin</code>。</p>
+<p>in和nin是一对，in相当于使用多个OR操作符：<code>db.products.find({&#39;tags&#39;: {$in: [ObjectId(&#39;...&#39;), ObjectId(&#39;...&#39;)]}})</code></p>
+<p>all的作用属性，必须是数组形式：<code>db.products.find({tags: {$all: [&#39;a&#39;, &#39;b&#39;]}})</code></p>
+<p>⚠️注意：in和all可以利用索引；nin不能利用索引，只能使用<strong>集合扫描</strong>。这和BTree结构有关。</p>
+<h4 id="布尔操作"><a href="#布尔操作" class="headerlink" title="布尔操作"></a>布尔操作</h4><p>常见的有：<code>$ne</code>、<code>$not</code>、 <code>$or</code>、 <code>$and</code>、<code>$exists</code>。同样的，<code>$ne</code>不能利用索引。</p>
+<p>对于not的使用，如果使用的操作符或者正则表达式不存在否定形式，才配合not。例如大于，就有小于等于操作符。</p>
+<p>对于or的使用，or可以<strong>表示不同键的值的关系</strong>，而in只能表示一个键的值的关系。例如：<code>db.products.find({ $or: [{ name: &#39;a&#39; }, { name: &#39;b&#39; }] })</code></p>
+<h4 id="子文档"><a href="#子文档" class="headerlink" title="子文档"></a>子文档</h4><p>对于内嵌对象匹配，用<code>.</code>运算符即可，正如前面的嵌套字段查询所述。</p>
+<p><strong>不推荐</strong>对于整个对象的查询，需要严格保证查询字段的顺序。</p>
+<h4 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h4><p>如果数组中元素是基础对象，那么直接查询即可。mongo识别字段是数组类型，会自动查询字段是否位于其中。</p>
+<p>例如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> db.products.insert(&#123;tags: [<span class="string">'a'</span>, <span class="string">'b'</span>]&#125;)</span></span><br><span class="line">WriteResult(&#123; "nInserted" : 1 &#125;)</span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> db.products.find(&#123;tags: <span class="string">'a'</span>&#125;)</span></span><br><span class="line">&#123; "_id" : ObjectId("5d948025da0946c664997712"), "tags" : [ "a", "b" ] &#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果数组中元素是复杂对象，可以借助<code>.</code>运算符进行访问：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> db.products.insert(&#123;address: [&#123;name: <span class="string">'home'</span>&#125;]&#125;)</span></span><br><span class="line">WriteResult(&#123; "nInserted" : 1 &#125;)</span><br><span class="line"><span class="meta">&gt;</span><span class="bash"> db.products.find(&#123;<span class="string">"address.name"</span>: <span class="string">'home'</span>&#125;)</span></span><br><span class="line">&#123; "_id" : ObjectId("5d948055da0946c664997713"), "address" : [ &#123; "name" : "home" &#125; ] &#125;</span><br></pre></td></tr></table></figure>
+
+<p>同样地，你也可以指定针对特定顺序的数组元素：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> db.products.find(&#123;<span class="string">"address.0.name"</span>: <span class="string">'home'</span>&#125;)</span></span><br><span class="line">&#123; "_id" : ObjectId("5d948055da0946c664997713"), "address" : [ &#123; "name" : "home" &#125; ] &#125;</span><br></pre></td></tr></table></figure>
+
+<p>⚠️如果要同时将<strong>多个条件限制在同一个子文档</strong>上，下面是错误和正确的做法?</p>
+<p>错误：<code>db.products.find({&quot;address.name&quot;: &#39;home&#39;, &#39;address.state&#39;: &#39;NY&#39;})</code></p>
+<p>正确：<code>db.products.find({address: {$elemMatch: {name: &#39;home&#39;, state: &#39;NY&#39;} }})</code></p>
+<h4 id="Javascript查询"><a href="#Javascript查询" class="headerlink" title="Javascript查询"></a>Javascript查询</h4><p>对于一些复杂查询，借助<code>$where</code>可以使用js表达式。还是以刚才的数据为例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> db.products.find(&#123;<span class="variable">$where</span>: <span class="string">"function() &#123;return this.address &amp;&amp; this.address.length&#125;"</span> &#125;)</span></span><br><span class="line">&#123; "_id" : ObjectId("5d948055da0946c664997713"), "address" : [ &#123; "name" : "home" &#125; ] &#125;</span><br></pre></td></tr></table></figure>
+
+<p>在使用的时候，需要启动js解释器和上下文，因此<strong>开销大</strong>。在使用的时候，尽量带上其他标准查询操作，来缩小查询范围。</p>
+<p>除此之外，还有注入攻击的可能。主要体现在驱动使用时候，如果后端传给db的字段是没做检验的，可能发生注入攻击。</p>
+<h4 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h4><p>主要体现在驱动使用上。</p>
+<p>如果支持js的正则，那么可以: <code>find({text: /best/i})</code></p>
+<p>如果不支持，那么：<code>find({text: {$regex: &#39;best&#39;, $options: &#39;i&#39;}})</code></p>
+<h4 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h4><p>通过<code>$type</code>，可以根据指定字段类型进行查询。不同的值，代表不同的类型。请见官方文档。</p>
+<h3 id="查询选项"><a href="#查询选项" class="headerlink" title="查询选项"></a>查询选项</h3><h4 id="投影"><a href="#投影" class="headerlink" title="投影"></a>投影</h4><p>1、使用选择字段进行返回，降低网络传输：<code>find</code>给定第二个参数。</p>
+<p>2、返回保存在结果数组中的某个范围的值：<code>$slice([start, limit])</code>。例如：<code>db.products.find({}, { comments: {$slice: 12}})</code></p>
+<h4 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h4><p>能够对<strong>多个字段</strong>进行升序/降序排列。例如：<code>db.comments.find().sort({rating: -1, votes: -1})</code></p>
+<h4 id="skip和limit"><a href="#skip和limit" class="headerlink" title="skip和limit"></a>skip和limit</h4><p>如果向skip传入很大的值，需要扫描同等数量的文档，浪费资源。</p>
+<p>最好的方法是：通过查询条件，缩小要扫描的文档。</p>
+<h3 id="聚合指令"><a href="#聚合指令" class="headerlink" title="聚合指令"></a>聚合指令</h3><p>在v2的版本中，mongo只能通过map、reduce等基础操作来支持聚合搜索。但在v3的版本后，mongo本身提供了丰富的聚合阶段(<a href="https://docs.mongodb.com/manual/reference/operator/aggregation-pipeline/" target="_blank" rel="noopener">aggregation pipeline</a>)和聚合运算符(<a href="https://docs.mongodb.com/manual/reference/operator/aggregation/" target="_blank" rel="noopener">aggregation operator</a>)。</p>
+<p>以<code>$group</code>和<code>$sum</code>为例，插入了a和b两种售卖货物以及价钱：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> db.sales.find()</span></span><br><span class="line">&#123; "_id" : ObjectId("5d98ca8094ffea590a8a85c6"), "name" : "a", "coin" : 100 &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5d98ca8694ffea590a8a85c7"), "name" : "a", "coin" : 200 &#125;</span><br><span class="line">&#123; "_id" : ObjectId("5d98ca9094ffea590a8a85c8"), "name" : "b", "coin" : 800 &#125;</span><br></pre></td></tr></table></figure>
+
+<p>利用聚合操作，就可以便捷算出每种货物的总价：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash"> db.sales.aggregate([&#123; <span class="variable">$group</span>: &#123; _id: <span class="string">"<span class="variable">$name</span>"</span>, total: &#123; <span class="variable">$sum</span>: <span class="string">"<span class="variable">$coin</span>"</span> &#125; &#125; &#125;])</span></span><br><span class="line">&#123; "_id" : "b", "total" : 800 &#125;</span><br><span class="line">&#123; "_id" : "a", "total" : 300 &#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后说一下，聚合的意义在于数据库提供给使用者此种功能以及相关优化。当然，使用者完全可以在逻辑层面查询到需要的集合，代码中进行计算。但对于服务的提供商，完整的服务是必不可少的。</p>
+<h2 id="更新、原子操作与删除"><a href="#更新、原子操作与删除" class="headerlink" title="更新、原子操作与删除"></a>更新、原子操作与删除</h2><h3 id="文档更新入门"><a href="#文档更新入门" class="headerlink" title="文档更新入门"></a>文档更新入门</h3><p>文档更新分为：替换更新和针对性更新。相较而言，<strong>针对性更新</strong>具有性能好、传输数据少和允许原子性更新的优点。</p>
+<p>利用<code>$set</code>和<code>$push</code>可以针对文档和其中的数组字段进行针对性更新，下面是针对性更新的例子：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">db.products.update(</span><br><span class="line">   &#123; _id: 100 &#125;,</span><br><span class="line">   &#123; $set:</span><br><span class="line">      &#123;</span><br><span class="line">        quantity: 500</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>如果是替换更新，遇到增加计数器值之类的场景，在不使用乐观锁的情况下，无法保证原子性更新。因为需要先读出数据，然后再更新。此过程中，可能会有其他并发程序重写字段，从而造成脏数据。</p>
+<p>以更新计数器的针对性更新为例：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">db.products.update(</span><br><span class="line">   &#123; sku: "abc123" &#125;,</span><br><span class="line">   &#123; $inc: &#123; quantity: -1 &#125; &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="电子商务数据模型中的更新"><a href="#电子商务数据模型中的更新" class="headerlink" title="电子商务数据模型中的更新"></a>电子商务数据模型中的更新</h3><h4 id="冗余字段设计"><a href="#冗余字段设计" class="headerlink" title="冗余字段设计"></a>冗余字段设计</h4><p>对于一些常见的结果，比如：总数、平均值等。为了避免每次都<strong>重新聚合运算</strong>，可以在文档中<strong>保存额外的字段缓存</strong>相关数据。</p>
+<p>之后的业务查询，仅仅需要查询一次即可。</p>
+<h4 id="操作符"><a href="#操作符" class="headerlink" title="$操作符"></a><code>$</code>操作符</h4><p>作用：确定数组中一个要被更新的元素的位置，而不用具体指定该元素在数组中的位置。</p>
+<p>如下所示，不需要知道在grades数组中匹配的具体位置，用<code>$</code>指代即可：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&gt; db.students.insert([</span><br><span class="line">   &#123; <span class="string">"_id"</span> : <span class="number">1</span>, <span class="string">"grades"</span> : [ <span class="number">85</span>, <span class="number">80</span>, <span class="number">80</span> ] &#125;</span><br><span class="line">])</span><br><span class="line">&gt; db.students.updateOne(</span><br><span class="line">   &#123; <span class="attr">_id</span>: <span class="number">1</span>, <span class="attr">grades</span>: <span class="number">80</span> &#125;,</span><br><span class="line">   &#123; <span class="attr">$set</span>: &#123; <span class="string">"grades.$"</span> : <span class="number">82</span> &#125; &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h4 id="upsert操作符"><a href="#upsert操作符" class="headerlink" title="upsert操作符"></a><code>upsert</code>操作符</h4><p>作用：如果不存在，则会自动<code>insert</code>。</p>
+<p>对于添加到商品到购物车等场景，非常适用。</p>
+<h3 id="事务性工作流"><a href="#事务性工作流" class="headerlink" title="事务性工作流"></a>事务性工作流</h3><p>这里主要使用的是<code>findAndModify</code>命令。这个命令，支持传入query参数，来做匹配筛选；支持update，来做针对性更新（原子更新）。最重要的特性是：<strong>可以根据<code>new</code>参数，来返回更新前后的文档数据状态</strong>。</p>
+<p>借助可以返回更新文档数据的特性，可以mock一下mongo 4.0之前不支持的事务特性。思路是：</p>
+<ol>
+<li>获取最初的文档数据</li>
+<li>利用findAndModify进行针对性更新，更新字段中需要携带本次的更新标示（比如时间戳）。findAndModify操作符会返回更新后的字段。</li>
+<li>将更新后的字段中的更新标示与本地保存的标示做对比，如果不相同，说明有别的端更新了数据，数据发生了污染，为了保证事务原子性的特点，将文档恢复为第1步获得原始数据；如果相同，那么继续进行。</li>
+</ol>
+<p>在MongoDB 4.0中，就是通过类似第二步的思路，提供了一个seesionID来实现了事务的，保证了事务特性。</p>
+<h3 id="更多的更新命令"><a href="#更多的更新命令" class="headerlink" title="更多的更新命令"></a>更多的更新命令</h3><p>update：multi参数不给，默认只更新匹配到的第一个文档。</p>
+<p>unset：删除文档中的指定键。</p>
+<p>rename：重命名键。</p>
+<p>addToSet：数组中不存在时候，才会加入。</p>
+<p>pull：删除数组指定位置的元素。</p>
+<h3 id="更新本质和优化"><a href="#更新本质和优化" class="headerlink" title="更新本质和优化"></a>更新本质和优化</h3><p>更新分为3种：</p>
+<ul>
+<li>只改变单值，但BSON文档不变：<code>$inc</code>操作符</li>
+<li>改变文档和结构，会重写整个文档：<code>$push</code></li>
+<li>改变文档造成空间不够，全部整体迁移到新空间：提前利用<strong>填充因子</strong>来减少影响</li>
+</ul>
+<h2 id="索引与查询优化"><a href="#索引与查询优化" class="headerlink" title="索引与查询优化"></a>索引与查询优化</h2><p>查询是非常高频的操作，大数据、高频读的场景下，查询的效率会是性能的瓶颈。设置<strong>合适的索引</strong>，可以充分利用数据结构（B数）和物理硬件的优势。</p>
+<h3 id="索引理论"><a href="#索引理论" class="headerlink" title="索引理论"></a>索引理论</h3><h4 id="复合索引和分离索引"><a href="#复合索引和分离索引" class="headerlink" title="复合索引和分离索引"></a>复合索引和分离索引</h4><p>一个查询中，要是有多个字段，比如2个字段。分离索引是：查找每个索引的匹配集合，取得这些匹配集合的交集。复合索引是：逐步根据索引的顺序做查询。</p>
+<p>比如有一个食谱，我们根据种类和菜名来做索引：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">肉类</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">辣子鸡：第12页</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">鱼肉：第139页</span></span><br></pre></td></tr></table></figure>
+
+<p>⚠️：复合索引中的顺序是非常重要的，如果设置的索引不合适，那么就相当于现行扫描文档。抽象来说，如果有一个针对a-b的复合索引，那么仅针对a的索引就是冗余的。比如例子中，仅针对种类的索引就是冗余的，但是种类索引可以降低扫描时间（和Btree有关）。</p>
+<h4 id="索引效率"><a href="#索引效率" class="headerlink" title="索引效率"></a>索引效率</h4><p>正确的索引，也不一定会有快速的查询：<strong>索引和数据集无法全部放入内存</strong>。</p>
+<p>如果内存充足，所有使用的数据文件都会载入内存，对应内存发生变化时（比如写操作），结果会异步刷到磁盘上。</p>
+<p>如果内存不足，就无法全部装入内存，出现<strong>页错误</strong>，操作系统会频繁访问磁盘读取需要数据。数据集过大时候，任何写操作都要去磁盘，会出现<strong>颠簸情况</strong>，性能下滑。</p>
+<p>因此，应该首先保证<strong>索引都能装入内存</strong>，复合索引时，尽量减少键的数量。</p>
+<h4 id="B树"><a href="#B树" class="headerlink" title="B树"></a>B树</h4><p>在Mongo Version2中，B树仅用于索引。集合存储是双向列表。</p>
+<p>对于复合索引的底层结构，以下面为例，是根据姓、名和生日来建立的复合索引。如果要查询(Akroyd, Kirsten, 1978-11-02)的数据，那么会先按照顺序查找，根据第一个索引，找到了只有左侧两个复合要求；再在左侧两个集合中查找第二个索引；直到找到符合要求的数据为止。</p>
+<p><img src="/images/database/mongo/%E5%A4%8D%E5%90%88%E7%B4%A2%E5%BC%95.jpg" alt="复合索引.jpg"></p>
+<p>参考链接：</p>
+<ul>
+<li><a href="https://www.zhihu.com/question/268703288" target="_blank" rel="noopener">mysql复合索引的底层数据结构？</a></li>
+<li><a href="https://www.cnblogs.com/nullzx/p/8729425.html" target="_blank" rel="noopener">B树和B+树的插入、删除</a></li>
+</ul>
+<h4 id="查询计划"><a href="#查询计划" class="headerlink" title="查询计划"></a>查询计划</h4><p>优化器会选择扫描索引项最少的索引。查询首次运行时，优化器会为每个可能有效适用于该查询的索引创建查询计划，随后并行运行各个计划，nscanned值最低的计划胜出。</p>
+<p>在发现了一个成功的计划之后，会记录下查询模式（query pattern）、nscanned的值以及索引说明。例如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123; pattern:&#123;stock_symbol:'equality',close: 'bound'&#125;, index:&#123;stock_symbol:1&#125;,nscanned:894&#125;</span><br></pre></td></tr></table></figure>
+
+<p>查询模式记录下了每个键的匹配类型(<code>三种范围匹配类型：上界（upper）、下界（lower）以及上下界（upper-and-lower）。查询模式还包含各种排序。</code>)，你正请求对stock_symbol的精确匹配（相等），对close的范围匹配（边界）。只要新的查询匹配此模式，就会使用该索引。<br>但这一信息不应该是永久的，实际情况也是如此。在发生以下事件之后优化器会自动让计划过期。</p>
+<ul>
+<li><p>对集合执行了100次写操作。</p>
+</li>
+<li><p>在集合上增加或删除了索引。</p>
+</li>
+<li><p>虽然使用了缓存的查询计划，但工作量大于预期。此处，“工作量大”的标准是nscanned超过缓存的nscanned值的10倍。</p>
+</li>
+</ul>
+<p>发生最后一种事件时，优化器会立即开始交错执行其他查询计划，也许另一个索引会更高效。</p>
+<h3 id="索引实践"><a href="#索引实践" class="headerlink" title="索引实践"></a>索引实践</h3><h4 id="索引类型"><a href="#索引类型" class="headerlink" title="索引类型"></a>索引类型</h4><p>根据索引设置时的属性的不同，常见的有：唯一性索引、稀疏索引和多键索引。</p>
+<p><strong>唯一性索引</strong></p>
+<p>说明：被设置为索引的字段，不能重复出现，否则会报错。</p>
+<p>创建方式：<code>db.col.createIndex({name: 1}, {unique: true})</code>。</p>
+<p>⚠️：适用于插入数据前先创建索引的情况</p>
+<h4 id="稀疏索引"><a href="#稀疏索引" class="headerlink" title="稀疏索引"></a>稀疏索引</h4><p>说明：索引默认是密集型的，是指为集合中每个文档都建立索引。例如前面的例子，即使文档没有name字段，那么查询索引时候，没有name字段的文档匹配null即可。</p>
+<p>创建方式：<code>db.col.createIndex({name: 1}, {sparse: true})</code></p>
+<p>优点：</p>
+<ul>
+<li>占用较少的空间</li>
+<li>适用于不是为所有文档增加唯一性索引</li>
+<li>适用于历史遗留的文档，无法保证字段存在</li>
+</ul>
+<h4 id="多键索引"><a href="#多键索引" class="headerlink" title="多键索引"></a>多键索引</h4><p>说明：在数组字段上建立索引。mongo中，多键索引是默认开启的。</p>
+<p>原理：数组中每个元素，都指向文档。</p>
+<h3 id="查询管理"><a href="#查询管理" class="headerlink" title="查询管理"></a>查询管理</h3><h4 id="构建索引"><a href="#构建索引" class="headerlink" title="构建索引"></a>构建索引</h4><p>分为为索引值排序、排序值插入索引中，并且会占用写锁，其他程序无法读写数据库。</p>
+<p>在迁移历史数据和索引的时候，先迁移数据再构建集合，比线构建集合再迁移数据 的做法更优秀。</p>
+<h4 id="后台索引"><a href="#后台索引" class="headerlink" title="后台索引"></a>后台索引</h4><p>设置background为true。虽然仍会占用写锁，但会停下来，让其他操作读写操作访问数据库。适合在流量最低的时候，完成索引构建。</p>
+<h4 id="备份"><a href="#备份" class="headerlink" title="备份"></a>备份</h4><p>mongodump和mongorestore只能保存集合和索引说明。</p>
+<p>如果想备份索引，必须直接备份mongo的数据文件。</p>
+<h4 id="压紧删除"><a href="#压紧删除" class="headerlink" title="压紧删除"></a>压紧删除</h4><p>对于删除大量数据，可能造成索引碎片化。解决方法是重建索引或者执行<code>db.col.reIndex()</code>.</p>
+<p>应该在子节点执行此命令，再进行节点替换，因为它会占用写锁，造成无法读写操作。</p>
+<h3 id="查询优化"><a href="#查询优化" class="headerlink" title="查询优化"></a>查询优化</h3><p>两个比较重要的原理，一个是<strong>覆盖索引</strong>，一个<strong>复合键的顺序</strong>。</p>
+<p>覆盖索引是指：查询的关键字和索引完全一致。</p>
+<p>复合键的顺序遵循：搜索成本由低到高的原则排列。</p>
+<h2 id="复制-1"><a href="#复制-1" class="headerlink" title="复制"></a>复制</h2><h3 id="复制概述"><a href="#复制概述" class="headerlink" title="复制概述"></a>复制概述</h3><p>定义：在多台服务器上分布并管理数据库服务器。有2种复制风格：主从复制和副本集（生产环境推荐）。</p>
+<p>复制的作用是<strong>冗余</strong>，因为复制是<strong>异步的</strong>，因此任何节点的延迟都不会影响主节点性能。</p>
+<p>副本不是备份替代品：备份是某事刻的快照；副本是最新的。</p>
+<p>作用：故障转移、均衡读负载。</p>
+<h3 id="副本集"><a href="#副本集" class="headerlink" title="副本集"></a>副本集</h3><p>最小的副本集由3个节点组成：主节点、从节点、仲裁节点。主从节点是一等的；仲裁节点不复制数据，中立观察。</p>
+<p><img src="/images/database/mongo/%E5%89%AF%E6%9C%AC%E9%9B%86.jpg" alt="副本集.jpg"></p>
+<p>副本集基于两个机制：oplog和心跳。oplog是记录数据的变更；心跳是检测主节点是否有效。</p>
+<p>在副本集中，「提交」是指：数据变动都被复制到从节点。否则就是未提交。</p>
+<h4 id="不适合的情况"><a href="#不适合的情况" class="headerlink" title="不适合的情况"></a>不适合的情况</h4><ul>
+<li>所分配的硬件无法处理给定的负载。以我上一章里提到的工作集为例，如果使用的工作数据集远大于可用内存，那么向从节点发送随机读请求仍然可能造成大量磁盘访问，导致慢查询。</li>
+<li>读写比超过50%。诚然，这个比例有点主观，但将它作为起始值还是挺合适的。此处的问题是主节点上的所有写操作最终也会写入从节点，把读操作导向正在处理大量写入的从节点有时会减缓复制过程，并不会提高读吞吐量。</li>
+<li>应用程序要求一致性读。从节点的复制是异步进行的，因此无法保证一定能读到主节点上最新写入的数据。在某些极端情况下，从节点可能延迟几个小时。</li>
+</ul>
+<h3 id="主从复制"><a href="#主从复制" class="headerlink" title="主从复制"></a><del>主从复制</del></h3><p>不推荐，副本集才是正道，原因如下：</p>
+<ul>
+<li>故障转移手动操作（没有仲裁节点）</li>
+<li>oplog只存在主节点</li>
+</ul>
+<h3 id="写关注和读拓展"><a href="#写关注和读拓展" class="headerlink" title="写关注和读拓展"></a>写关注和读拓展</h3><p><a href="https://docs.mongodb.com/manual/reference/write-concern/" target="_blank" rel="noopener">Write Concern — MongoDB Manual</a>：设置<code>writeConcern</code>参数，通过属性设置来指定wtimeout、w。</p>
+<p>读拓展：单台服务器无法承受程序的读负载，将查询分配到副本上。</p>
+<h2 id="分片"><a href="#分片" class="headerlink" title="分片"></a>分片</h2><p>这是一个有意思的概念，尤其是「复制」对比的时候。复制是指数据都保存在单机上，向其他副本迁移，理论上所有主从节点数据是一致的；分片是指由于空间有限，单机承受不了数据量，同一个数据库分布在不同的数据库上，这些数据库形成了一个宏观意义上的节点。</p>
+<p><img src="/images/database/mongo/%E5%88%86%E7%89%87.jpg" alt="分片.jpg"></p>
+<h3 id="mongos路由器"><a href="#mongos路由器" class="headerlink" title="mongos路由器"></a>mongos路由器</h3><p>mongos 进程是一个路由器，将所有的读写请求指引到合适的分片上。</p>
+<h3 id="拆分和迁移"><a href="#拆分和迁移" class="headerlink" title="拆分和迁移"></a>拆分和迁移</h3><p>分片一开始只有一个块，块的大小达到阈值时进行拆分，默认的块的最大块尺寸是64MB或者100000个文档，先达成那个标准就以那个标准为准。</p>
+<p>迁移是由名为均衡器（balancer）的软件进程管理的，它的任务就是确保数据在各个分片中保持均匀分布。通过跟踪各分片上块的数量，就能实现这个功能。虽然均衡的触发会随总数据量的不同而变化，但是通常来说，当集群中拥有块最多的分片与拥有块最少的分片的块数差大于8时，均衡器就会发起一次均衡处理。在均衡过程中，块会从块较多的分片迁移到块较少的分片上，直到两个分片的块数大致相等为止。</p>
+<h3 id="分片查询类型"><a href="#分片查询类型" class="headerlink" title="分片查询类型"></a>分片查询类型</h3><p>如果查询包含分片键，那么mongos通过块数据能很快定位哪个分片包含查询的结果集。这称为针对性查询（targeted query）。<br>但是，如果分片键不是查询的一部分，那么查询计划器就不得不访问所有分片来完成查询。这称为全局查询或分散/聚集查询</p>
+<h3 id="分片和索引"><a href="#分片和索引" class="headerlink" title="分片和索引"></a>分片和索引</h3><p>每个分片都维护了自己的索引。这点应该是显而易见的，当你在分片集合上声明索引时，每个分片都会为它那部分集合构建独立的索引。</p>
+<p>分片集合只允许在_id字段和分片键上添加唯一性索引。其他地方不行，因为这需要在分片间进行通信，实施起来很复杂，而且相信这么做速度也很慢，没有实现的价值。</p>
+<h3 id="理想的分片键"><a href="#理想的分片键" class="headerlink" title="理想的分片键"></a>理想的分片键</h3><ul>
+<li>将插入数据均匀分布到各个分片上；（分布性差的分片键会抵消掉分片的一个好处：将插入的负载自动分布到不同机器上。例如：按照升序的BSON id，就是一个分布性很差的键，每次插入都集中在很小的范围内）</li>
+<li>保证CRUD操作能够利用局部性；（太分散的话，如果数据量太大导致索引无法全部装入内存造成索引频繁的进行页交换会损失性能）</li>
+<li>有足够的粒度进行块拆分。（例如：如果按照用户id分片，但是一个用户可能有很多数据，那一个分片可能无法进行拆分，这就不够细粒度）</li>
+</ul>
+<h2 id="基本配置选项"><a href="#基本配置选项" class="headerlink" title="基本配置选项"></a>基本配置选项</h2><p>–dbpath<br> 　指向存放数据文件的目录路径，默认是/data/db。<br>–logpath<br> 　指向日志输出文件的路径。日志默认会输出在标准输出（stdout）里。<br>–port<br> 　MongoDB监听的端口；如果没有指定，则设置为27017。<br>–rest<br> 　该标志将开启简单REST接口，增强服务器的默认Web控制台。Web控制台总是运行在服务器监听端口之上的第1000个端口。因此，如果服务器在监听localhost的27017端口，那么Web控制台就在<a href="http://localhost:28017/。请花些时间研究Web控制台及其发布的命令，因为你能从中发现不少线上MongoDB服务器的信息。" target="_blank" rel="noopener">http://localhost:28017/。请花些时间研究Web控制台及其发布的命令，因为你能从中发现不少线上MongoDB服务器的信息。</a><br>–fork<br> 　让进程以守护进程方式运行。请注意，fork只能用在Unix类的系统上。需要类似功能的Windows用户请查看指南，了解如何以Windows服务的方式运行MongoDB。可以在mongodb.org找到这些指南。那些都是最重要的MongoDB启动标志，以下是在命令行中使用它们的例子：<br>$ mongod –dbpath /var/local/mongodb –logpath /var/log/mongodb.log –port 27018 –rest –fork</p>
+<p>请注意，你也可以在一个配置文件中指定全部这些选项。创建一个新的文本文件（称为mongodb.conf），内容如下：<br>dbpath=/var/local/mongodb<br>logpath=/var/log/mongodb.log<br>port=27018<br>rest=true<br>fork=true</p>
+<p>在调用mongod时，通过-f选项来使用配置文件：<br>$ mongod -f mongodb.conf</p>
+<p>如果连接上了一个MongoDB服务器，想知道启动时用了哪些选项，可以运行getCmdLineOpts命令获得一份启动选项列表：</p>
+<blockquote>
+<p>use admin<br>db.runCommand({getCmdLineOpts: 1})</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mongo/" rel="tag"># mongo</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/07/28/database/redisbooks/" rel="prev" title="Redis设计与实现-读书笔记">
+      <i class="fa fa-chevron-left"></i> Redis设计与实现-读书笔记
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2025/10/07/the%20first%20post/" rel="next" title="Hello World">
+      Hello World <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基本概念"><span class="nav-number">1.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#简介"><span class="nav-number">1.1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主要特性"><span class="nav-number">1.2.</span> <span class="nav-text">主要特性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#数据模型"><span class="nav-number">1.2.1.</span> <span class="nav-text">数据模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#即时查询"><span class="nav-number">1.2.2.</span> <span class="nav-text">即时查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#二级索引"><span class="nav-number">1.2.3.</span> <span class="nav-text">二级索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#复制"><span class="nav-number">1.2.4.</span> <span class="nav-text">复制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#写速度和持久性"><span class="nav-number">1.2.5.</span> <span class="nav-text">写速度和持久性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据库扩展"><span class="nav-number">1.2.6.</span> <span class="nav-text">数据库扩展</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#核心服务器和工具"><span class="nav-number">1.3.</span> <span class="nav-text">核心服务器和工具</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#核心服务器"><span class="nav-number">1.3.1.</span> <span class="nav-text">核心服务器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lock文件和-ns文件"><span class="nav-number">1.3.2.</span> <span class="nav-text">.lock文件和.ns文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#命令行"><span class="nav-number">1.3.3.</span> <span class="nav-text">命令行</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#命令行工具"><span class="nav-number">1.3.4.</span> <span class="nav-text">命令行工具</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mongo的场景"><span class="nav-number">1.4.</span> <span class="nav-text">Mongo的场景</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#程序编写基础"><span class="nav-number">2.</span> <span class="nav-text">程序编写基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#驱动工作原理"><span class="nav-number">2.1.</span> <span class="nav-text">驱动工作原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#对象ID"><span class="nav-number">2.1.1.</span> <span class="nav-text">对象ID</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安全写入模式-Write-Concern"><span class="nav-number">2.2.</span> <span class="nav-text">安全写入模式(Write Concern)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#面向文档的数据"><span class="nav-number">3.</span> <span class="nav-text">面向文档的数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#具体细节"><span class="nav-number">3.1.</span> <span class="nav-text">具体细节</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#数据库"><span class="nav-number">3.1.1.</span> <span class="nav-text">数据库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#集合"><span class="nav-number">3.1.2.</span> <span class="nav-text">集合</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查询和聚合"><span class="nav-number">4.</span> <span class="nav-text">查询和聚合</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#查询常见技巧"><span class="nav-number">4.1.</span> <span class="nav-text">查询常见技巧</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常见查询语言"><span class="nav-number">4.2.</span> <span class="nav-text">常见查询语言</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#范围查询"><span class="nav-number">4.2.1.</span> <span class="nav-text">范围查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#集合操作"><span class="nav-number">4.2.2.</span> <span class="nav-text">集合操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#布尔操作"><span class="nav-number">4.2.3.</span> <span class="nav-text">布尔操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#子文档"><span class="nav-number">4.2.4.</span> <span class="nav-text">子文档</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数组"><span class="nav-number">4.2.5.</span> <span class="nav-text">数组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Javascript查询"><span class="nav-number">4.2.6.</span> <span class="nav-text">Javascript查询</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#正则表达式"><span class="nav-number">4.2.7.</span> <span class="nav-text">正则表达式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#类型"><span class="nav-number">4.2.8.</span> <span class="nav-text">类型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查询选项"><span class="nav-number">4.3.</span> <span class="nav-text">查询选项</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#投影"><span class="nav-number">4.3.1.</span> <span class="nav-text">投影</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#排序"><span class="nav-number">4.3.2.</span> <span class="nav-text">排序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#skip和limit"><span class="nav-number">4.3.3.</span> <span class="nav-text">skip和limit</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#聚合指令"><span class="nav-number">4.4.</span> <span class="nav-text">聚合指令</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更新、原子操作与删除"><span class="nav-number">5.</span> <span class="nav-text">更新、原子操作与删除</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#文档更新入门"><span class="nav-number">5.1.</span> <span class="nav-text">文档更新入门</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#电子商务数据模型中的更新"><span class="nav-number">5.2.</span> <span class="nav-text">电子商务数据模型中的更新</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#冗余字段设计"><span class="nav-number">5.2.1.</span> <span class="nav-text">冗余字段设计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#操作符"><span class="nav-number">5.2.2.</span> <span class="nav-text">$操作符</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#upsert操作符"><span class="nav-number">5.2.3.</span> <span class="nav-text">upsert操作符</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#事务性工作流"><span class="nav-number">5.3.</span> <span class="nav-text">事务性工作流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更多的更新命令"><span class="nav-number">5.4.</span> <span class="nav-text">更多的更新命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更新本质和优化"><span class="nav-number">5.5.</span> <span class="nav-text">更新本质和优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#索引与查询优化"><span class="nav-number">6.</span> <span class="nav-text">索引与查询优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#索引理论"><span class="nav-number">6.1.</span> <span class="nav-text">索引理论</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#复合索引和分离索引"><span class="nav-number">6.1.1.</span> <span class="nav-text">复合索引和分离索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#索引效率"><span class="nav-number">6.1.2.</span> <span class="nav-text">索引效率</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#B树"><span class="nav-number">6.1.3.</span> <span class="nav-text">B树</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查询计划"><span class="nav-number">6.1.4.</span> <span class="nav-text">查询计划</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#索引实践"><span class="nav-number">6.2.</span> <span class="nav-text">索引实践</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#索引类型"><span class="nav-number">6.2.1.</span> <span class="nav-text">索引类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#稀疏索引"><span class="nav-number">6.2.2.</span> <span class="nav-text">稀疏索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多键索引"><span class="nav-number">6.2.3.</span> <span class="nav-text">多键索引</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查询管理"><span class="nav-number">6.3.</span> <span class="nav-text">查询管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#构建索引"><span class="nav-number">6.3.1.</span> <span class="nav-text">构建索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#后台索引"><span class="nav-number">6.3.2.</span> <span class="nav-text">后台索引</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#备份"><span class="nav-number">6.3.3.</span> <span class="nav-text">备份</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#压紧删除"><span class="nav-number">6.3.4.</span> <span class="nav-text">压紧删除</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查询优化"><span class="nav-number">6.4.</span> <span class="nav-text">查询优化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#复制-1"><span class="nav-number">7.</span> <span class="nav-text">复制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#复制概述"><span class="nav-number">7.1.</span> <span class="nav-text">复制概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#副本集"><span class="nav-number">7.2.</span> <span class="nav-text">副本集</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#不适合的情况"><span class="nav-number">7.2.1.</span> <span class="nav-text">不适合的情况</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主从复制"><span class="nav-number">7.3.</span> <span class="nav-text">主从复制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#写关注和读拓展"><span class="nav-number">7.4.</span> <span class="nav-text">写关注和读拓展</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分片"><span class="nav-number">8.</span> <span class="nav-text">分片</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#mongos路由器"><span class="nav-number">8.1.</span> <span class="nav-text">mongos路由器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#拆分和迁移"><span class="nav-number">8.2.</span> <span class="nav-text">拆分和迁移</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分片查询类型"><span class="nav-number">8.3.</span> <span class="nav-text">分片查询类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分片和索引"><span class="nav-number">8.4.</span> <span class="nav-text">分片和索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#理想的分片键"><span class="nav-number">8.5.</span> <span class="nav-text">理想的分片键</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本配置选项"><span class="nav-number">9.</span> <span class="nav-text">基本配置选项</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Cai Kenny</p>
+  <div class="site-description" itemprop="description">A Programmer</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Cai Kenny</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.2.1
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.6.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
